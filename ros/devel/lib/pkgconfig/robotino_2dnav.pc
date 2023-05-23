@@ -1,8 +1,0 @@
-prefix=/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel
-
-Name: robotino_2dnav
-Description: Description of robotino_2dnav
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

@@ -1,8 +1,0 @@
-prefix=/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel
-
-Name: robotino_msgs
-Description: Description of robotino_msgs
-Version: 0.0.0
-Cflags: -I/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel/include
-Libs: -L${prefix}/lib 
-Requires: message_runtime

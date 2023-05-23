@@ -1,8 +1,0 @@
-prefix=/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel
-
-Name: robotino_teleop_joy
-Description: Description of robotino_teleop_joy
-Version: 0.0.0
-Cflags: -I/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/robots/robotino/robotino_teleop_joy/include
-Libs: -L${prefix}/lib -lrobotino_teleop_joy
-Requires: geometry_msgs robotino_msgs sensor_msgs

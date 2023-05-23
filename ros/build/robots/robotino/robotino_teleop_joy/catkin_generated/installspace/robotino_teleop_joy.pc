@@ -1,8 +1,0 @@
-prefix=/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install
-
-Name: robotino_teleop_joy
-Description: Description of robotino_teleop_joy
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib -lrobotino_teleop_joy
-Requires: geometry_msgs robotino_msgs sensor_msgs
