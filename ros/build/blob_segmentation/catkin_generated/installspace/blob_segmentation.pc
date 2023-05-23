@@ -1,8 +1,8 @@
-prefix=/home/hidalgo/TFG/ros/install
+prefix=/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install
 
 Name: blob_segmentation
 Description: Description of blob_segmentation
 Version: 0.0.0
-Cflags: -I${prefix}/include
+Cflags: 
 Libs: -L${prefix}/lib 
-Requires: cv_bridge image_transport rospy sensor_msgs message_runtime
+Requires: cv_bridge image_transport rospy sensor_msgs

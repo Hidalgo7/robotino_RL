@@ -1,4 +1,4 @@
-prefix=/home/hidalgo/TFG/ros/install
+prefix=/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install
 
 Name: gazebo_utils
 Description: Description of gazebo_utils

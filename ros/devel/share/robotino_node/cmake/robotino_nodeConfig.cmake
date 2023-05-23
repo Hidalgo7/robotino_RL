@@ -67,14 +67,14 @@ set(robotino_node_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(robotino_node_SOURCE_PREFIX /home/hidalgo/TFG/ros/src/robots/robotino/robotino_node)
-  set(robotino_node_DEVEL_PREFIX /home/hidalgo/TFG/ros/devel)
+  set(robotino_node_SOURCE_PREFIX /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/robots/robotino/robotino_node)
+  set(robotino_node_DEVEL_PREFIX /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel)
   set(robotino_node_INSTALL_PREFIX "")
   set(robotino_node_PREFIX ${robotino_node_DEVEL_PREFIX})
 else()
   set(robotino_node_SOURCE_PREFIX "")
   set(robotino_node_DEVEL_PREFIX "")
-  set(robotino_node_INSTALL_PREFIX /home/hidalgo/TFG/ros/install)
+  set(robotino_node_INSTALL_PREFIX /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install)
   set(robotino_node_PREFIX ${robotino_node_INSTALL_PREFIX})
 endif()
 
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(robotino_node_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/home/hidalgo/TFG/ros/src/robots/robotino/robotino_node/include " STREQUAL " ")
+if(NOT "/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/robots/robotino/robotino_node/include " STREQUAL " ")
   set(robotino_node_INCLUDE_DIRS "")
-  set(_include_dirs "/home/hidalgo/TFG/ros/src/robots/robotino/robotino_node/include")
+  set(_include_dirs "/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/robots/robotino/robotino_node/include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -110,7 +110,7 @@ if(NOT "/home/hidalgo/TFG/ros/src/robots/robotino/robotino_node/include " STREQU
         message(FATAL_ERROR "Project 'robotino_node' specifies '${idir}' as an include dir, which is not found.  It does not exist in '${include}'.  ${_report}")
       endif()
     else()
-      message(FATAL_ERROR "Project 'robotino_node' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/hidalgo/TFG/ros/src/robots/robotino/robotino_node/${idir}'.  ${_report}")
+      message(FATAL_ERROR "Project 'robotino_node' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/robots/robotino/robotino_node/${idir}'.  ${_report}")
     endif()
     _list_append_unique(robotino_node_INCLUDE_DIRS ${include})
   endforeach()
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/hidalgo/TFG/ros/devel/lib;/home/hidalgo/TFG/ros/devel/lib;/home/hidalgo/rka/ros/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel/lib;/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel/lib;/home/bee/irakaskuntza/robotica-social/ros/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

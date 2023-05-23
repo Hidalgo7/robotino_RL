@@ -11,7 +11,7 @@
 
 # since this file is sourced either use the provided _CATKIN_SETUP_DIR
 # or fall back to the destination set at configure time
-: ${_CATKIN_SETUP_DIR:=/home/hidalgo/TFG/ros/devel}
+: ${_CATKIN_SETUP_DIR:=/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel}
 _SETUP_UTIL="$_CATKIN_SETUP_DIR/_setup_util.py"
 unset _CATKIN_SETUP_DIR
 

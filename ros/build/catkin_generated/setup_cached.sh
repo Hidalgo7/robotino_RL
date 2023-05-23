@@ -7,4 +7,7 @@
 # new environment variables
 
 # modified environment variables
-export PWD='/home/hidalgo/TFG/ros/build'
+export LD_LIBRARY_PATH='/home/bee/irakaskuntza/robotica-social/ros/devel/lib:/opt/ros/noetic/lib:/opt/ros/noetic/lib/x86_64-linux-gnu:/usr/local/webots/lib/controller'
+export PKG_CONFIG_PATH='/home/bee/irakaskuntza/robotica-social/ros/devel/lib/pkgconfig:/opt/ros/noetic/lib/pkgconfig:/opt/ros/noetic/lib/x86_64-linux-gnu/pkgconfig'
+export PWD='/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/build'
+export PYTHONPATH='/home/bee/irakaskuntza/robotica-social/ros/devel/lib/python3/dist-packages:/opt/ros/noetic/lib/python3/dist-packages:/usr/local/webots/lib/controller'

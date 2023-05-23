@@ -1,14 +1,15 @@
 <launch>
     <!-- Launch world -->
-    
-    <include file="$(find gazebo_utils)/launch/training.launch">
-        <arg name="robotino" default="true"/>
-    </include>
+    <include file="$(find gazebo_utils)/launch/training.launch"/>
     <!-- Image segmentation -->
     <include file="$(find blob_segmentation)/launch/segment.launch"/>
-
     <!-- Training -->
     <node pkg="line_following" name="training" type="training.py" output="screen">
+        <param name="reward_th" type="double" value="-200" />
+        <param name="policy" type="int" value="0" /> <!-- MlpPolicy = 0, CnnPolicy = 1, MultiInputPolicy = 2-->
+        <param name="buff_size" type="int" value="10000" />
+        <param name="train_hz" type="int" value="3" />
+        <param name="timesteps" type="int" value="1000" />
     </node>
 
 </launch>

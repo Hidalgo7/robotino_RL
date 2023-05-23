@@ -67,14 +67,14 @@ set(robotino_2dnav_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(robotino_2dnav_SOURCE_PREFIX /home/hidalgo/TFG/ros/src/robots/robotino/robotino_2dnav)
-  set(robotino_2dnav_DEVEL_PREFIX /home/hidalgo/TFG/ros/devel)
+  set(robotino_2dnav_SOURCE_PREFIX /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/robots/robotino/robotino_2dnav)
+  set(robotino_2dnav_DEVEL_PREFIX /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel)
   set(robotino_2dnav_INSTALL_PREFIX "")
   set(robotino_2dnav_PREFIX ${robotino_2dnav_DEVEL_PREFIX})
 else()
   set(robotino_2dnav_SOURCE_PREFIX "")
   set(robotino_2dnav_DEVEL_PREFIX "")
-  set(robotino_2dnav_INSTALL_PREFIX /home/hidalgo/TFG/ros/install)
+  set(robotino_2dnav_INSTALL_PREFIX /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install)
   set(robotino_2dnav_PREFIX ${robotino_2dnav_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/hidalgo/TFG/ros/install/lib;/home/hidalgo/TFG/ros/devel/lib;/home/hidalgo/rka/ros/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install/lib;/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel/lib;/home/bee/irakaskuntza/robotica-social/ros/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

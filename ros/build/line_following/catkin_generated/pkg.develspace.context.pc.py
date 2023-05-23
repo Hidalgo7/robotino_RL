@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "line_following"
-PROJECT_SPACE_DIR = "/home/hidalgo/TFG/ros/devel"
+PROJECT_SPACE_DIR = "/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel"
 PROJECT_VERSION = "0.0.0"

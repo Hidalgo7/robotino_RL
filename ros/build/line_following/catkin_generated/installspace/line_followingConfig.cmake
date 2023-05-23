@@ -67,14 +67,14 @@ set(line_following_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(line_following_SOURCE_PREFIX /home/hidalgo/TFG/ros/src/line_following)
-  set(line_following_DEVEL_PREFIX /home/hidalgo/TFG/ros/devel)
+  set(line_following_SOURCE_PREFIX /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/line_following)
+  set(line_following_DEVEL_PREFIX /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel)
   set(line_following_INSTALL_PREFIX "")
   set(line_following_PREFIX ${line_following_DEVEL_PREFIX})
 else()
   set(line_following_SOURCE_PREFIX "")
   set(line_following_DEVEL_PREFIX "")
-  set(line_following_INSTALL_PREFIX /home/hidalgo/TFG/ros/install)
+  set(line_following_INSTALL_PREFIX /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install)
   set(line_following_PREFIX ${line_following_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/hidalgo/TFG/ros/install/lib;/home/hidalgo/TFG/ros/devel/lib;/home/hidalgo/rka/ros/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install/lib;/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel/lib;/home/bee/irakaskuntza/robotica-social/ros/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

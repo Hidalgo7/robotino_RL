@@ -1,9 +1,6 @@
 <launch>
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
 
-  <arg name="robotino" default="true"/> 
-  <arg name="turtlebot" default="false"/>
-  <arg name="tartalo" default="false"/>
   <arg name="rviz" default="false"/>
 
   <env name="GAZEBO_MODEL_PATH" value="$(find gazebo_utils)/models:$GAZEBO_MODEL_PATH"/>
@@ -14,50 +11,17 @@
     <!-- more default parameters can be changed here -->
   </include>
 
+  <!-- Run transforms -->
+  <!-- param name="tf_prefix" value="robotino"/-->
+  <include file="$(find robotino_description)/launch/robotino_description.launch"/>
 
-  <group if="$(arg robotino)">
-    <!-- Run transforms -->
-    <!-- param name="tf_prefix" value="robotino"/-->
-    <include file="$(find robotino_description)/launch/robotino_description.launch"/>
+  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+  args="-urdf -model robotino -param robot_description -x -0.95 -y -0.30 -z 0.15 -Y 1.5"/>
 
-    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-    args="-urdf -model robotino -param robot_description -x -0.95 -y -0.30 -z 0.15 -Y 1.5"/>
-
-    <!-- Visualize Rviz -->
-    <group if="$(arg rviz)">
-      <node type="rviz" name="rviz" pkg="rviz" args="-d $(find gazebo_utils)/rviz/robotino.rviz" />
-    </group>
-  </group>
-
-  <group if="$(arg turtlebot)">
-    <!-- Run transforms -->
-    <!-- param name="tf_prefix" value="robotino"/-->
-    <include file="$(find turtlebot_description)/launch/turtlebot_description.launch"/>
-
-    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-    args="-urdf -model mobile_base -param robot_description -x -5.2 -y -4.5 -Y 0.0"/>
-    
-    <!-- Visualize Rviz -->
-    <group if="$(arg rviz)">
-      <node type="rviz" name="rviz" pkg="rviz" args="-d $(find gazebo_utils)/rviz/turtlebot.rviz" />
-    </group>
-  </group>
-
-  <group if="$(arg tartalo)">
-    <!-- Run transforms -->
-    <!-- param name="tf_prefix" value="robotino"/-->
-    <include file="$(find tartalo_description)/launch/tartalo_description.launch"/>
-
-    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-    args="-urdf -model tartalo -param robot_description -x -5.2 -y -4.5 -Y 0.0"/>
-    
-    <!-- Visualize Rviz -->
-    <group if="$(arg rviz)">
-      <node type="rviz" name="rviz" pkg="rviz" args="-d $(find gazebo_utils)/rviz/turtlebot.rviz" />
-    </group>
+  <!-- Visualize Rviz -->
+  <group if="$(arg rviz)">
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find gazebo_utils)/rviz/robotino.rviz" />
   </group>
   
 </launch>

@@ -2,7 +2,7 @@
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/hidalgo/TFG/ros/install")
+  set(CMAKE_INSTALL_PREFIX "/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -37,9 +37,14 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
+# Set default install directory permissions.
+if(NOT DEFINED CMAKE_OBJDUMP)
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+endif()
+
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/hidalgo/TFG/ros/build/gtest/googlemock/cmake_install.cmake")
+  include("/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/build/gtest/googlemock/cmake_install.cmake")
 
 endif()
 

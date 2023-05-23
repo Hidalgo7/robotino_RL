@@ -2,6 +2,7 @@ import rospy
 import json
 import numpy as np
 import sys
+import os
 
 from gym import utils, spaces
 from gym.envs.robotino import gazebo_env
@@ -14,9 +15,11 @@ from std_srvs.srv import Empty
 from cv_bridge import CvBridge
 
 from gym.utils import seeding
-sys.path.append('/home/hidalgo/TFG/ros/src/blob_segmentation/scripts')
-import segment_blob
 
+#segment_blob_path = '/home/hidalgo/TFG/ros/src/blob_segmentation/scripts'
+segment_blob_path = '/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/blob_segmentation/scripts'
+sys.path.append(segment_blob_path)
+import segment_blob
 
 class Circuit:
     def __init__(self,start,finish):
@@ -35,11 +38,17 @@ class GazeboRobotinoEnv(gazebo_env.GazeboEnv):
 
     def __init__(self):
 
+        # ROS topic names
+        self.cmd_vel_topic = "/cmd_vel"
+        self.filtered_image_topic = "/filtered_image"
+        
         # Import circuits from circuits.json
         self.num_circuits = 0
         self.circuits = []
 
-        f = open('/home/hidalgo/.local/lib/python3.8/site-packages/gym/envs/robotino/circuits.json')
+        # self.circuits_path = "/home/hidalgo/.local/lib/python3.8/site-packages/gym/envs/robotino/circuits.json"
+        circuits_path = "/usr/local/lib/python3.8/dist-packages/gym/envs/robotino/circuits.json"
+        f = open(circuits_path)
         data = json.load(f)
 
         for circuit in data['Circuits']:
@@ -48,7 +57,6 @@ class GazeboRobotinoEnv(gazebo_env.GazeboEnv):
             self.circuits.append(new_circuit)
 
         # Rospy service proxies
-
         self.unpause = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
         self.pause = rospy.ServiceProxy('/gazebo/pause_physics', Empty)
         self.reset_proxy = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
@@ -62,17 +70,18 @@ class GazeboRobotinoEnv(gazebo_env.GazeboEnv):
                                             shape=(self.image_height,self.image_width,3), dtype=np.uint8)
 
         # Define action space
-        self.max_linear_speed = 2.0
+        self.max_linear_speed = 0.5
+        self.min_linear_speed = 0.1
         self.max_angular_speed = 0.3
 
-        self.action_space = spaces.Box(low=np.array([0.2, -self.max_angular_speed]),
+        self.action_space = spaces.Box(low=np.array([self.min_linear_speed, -self.max_angular_speed]),
                                         high=np.array([self.max_linear_speed, self.max_angular_speed]),
                                         dtype=np.float32)
         
         # Speed Publisher
 
-        self.vel_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=5)
-        self.blob_sub = rospy.Subscriber("/filtered_image", Image, queue_size=1)
+        self.vel_pub = rospy.Publisher(self.cmd_vel_topic, Twist, queue_size=5)
+        self.blob_sub = rospy.Subscriber(self.filtered_image_topic, Image, queue_size=1)
 
         # Actual circuit, to know if the robot has reached the final coordinates
 
@@ -94,7 +103,7 @@ class GazeboRobotinoEnv(gazebo_env.GazeboEnv):
         data = None
         while data is None:
             try:
-                data = rospy.wait_for_message('/filtered_image', Image, timeout=5)
+                data = rospy.wait_for_message(self.filtered_image_topic, Image, timeout=5)
             except:
                 pass
 
@@ -115,6 +124,7 @@ class GazeboRobotinoEnv(gazebo_env.GazeboEnv):
             reward = 0
             print("Objective reached")
         else:
+            
             if not segment_blob.detectLine(data):
                 done = True
                 reward = -5
@@ -169,7 +179,7 @@ class GazeboRobotinoEnv(gazebo_env.GazeboEnv):
         data = None
         while data is None:
             try:
-                data = rospy.wait_for_message('/filtered_image', Image, timeout=5)
+                data = rospy.wait_for_message(self.filtered_image_topic, Image, timeout=5)
             except:
                 pass
 

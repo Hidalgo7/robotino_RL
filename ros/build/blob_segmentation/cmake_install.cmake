@@ -1,8 +1,8 @@
-# Install script for directory: /home/hidalgo/TFG/ros/src/blob_segmentation
+# Install script for directory: /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/blob_segmentation
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/hidalgo/TFG/ros/install")
+  set(CMAKE_INSTALL_PREFIX "/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -37,54 +37,23 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/blob_segmentation/msg" TYPE FILE FILES "/home/hidalgo/TFG/ros/src/blob_segmentation/msg/Centroid.msg")
+# Set default install directory permissions.
+if(NOT DEFINED CMAKE_OBJDUMP)
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/blob_segmentation/cmake" TYPE FILE FILES "/home/hidalgo/TFG/ros/build/blob_segmentation/catkin_generated/installspace/blob_segmentation-msg-paths.cmake")
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/build/blob_segmentation/catkin_generated/installspace/blob_segmentation.pc")
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "/home/hidalgo/TFG/ros/devel/include/blob_segmentation")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/roseus/ros" TYPE DIRECTORY FILES "/home/hidalgo/TFG/ros/devel/share/roseus/ros/blob_segmentation")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/common-lisp/ros" TYPE DIRECTORY FILES "/home/hidalgo/TFG/ros/devel/share/common-lisp/ros/blob_segmentation")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/gennodejs/ros" TYPE DIRECTORY FILES "/home/hidalgo/TFG/ros/devel/share/gennodejs/ros/blob_segmentation")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  execute_process(COMMAND "/usr/bin/python3" -m compileall "/home/hidalgo/TFG/ros/devel/lib/python3/dist-packages/blob_segmentation")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python3/dist-packages" TYPE DIRECTORY FILES "/home/hidalgo/TFG/ros/devel/lib/python3/dist-packages/blob_segmentation")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/hidalgo/TFG/ros/build/blob_segmentation/catkin_generated/installspace/blob_segmentation.pc")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/blob_segmentation/cmake" TYPE FILE FILES "/home/hidalgo/TFG/ros/build/blob_segmentation/catkin_generated/installspace/blob_segmentation-msg-extras.cmake")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/blob_segmentation/cmake" TYPE FILE FILES
-    "/home/hidalgo/TFG/ros/build/blob_segmentation/catkin_generated/installspace/blob_segmentationConfig.cmake"
-    "/home/hidalgo/TFG/ros/build/blob_segmentation/catkin_generated/installspace/blob_segmentationConfig-version.cmake"
+    "/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/build/blob_segmentation/catkin_generated/installspace/blob_segmentationConfig.cmake"
+    "/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/build/blob_segmentation/catkin_generated/installspace/blob_segmentationConfig-version.cmake"
     )
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/blob_segmentation" TYPE FILE FILES "/home/hidalgo/TFG/ros/src/blob_segmentation/package.xml")
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/blob_segmentation" TYPE FILE FILES "/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/blob_segmentation/package.xml")
 endif()
 

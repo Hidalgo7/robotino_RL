@@ -1,6 +1,6 @@
 # CMake generated Testfile for 
-# Source directory: /home/hidalgo/TFG/ros/src/blob_segmentation
-# Build directory: /home/hidalgo/TFG/ros/build/blob_segmentation
+# Source directory: /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/blob_segmentation
+# Build directory: /home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/build/blob_segmentation
 # 
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.

@@ -1,4 +1,4 @@
-prefix=/home/hidalgo/TFG/ros/devel
+prefix=/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel
 
 Name: line_following
 Description: Description of line_following

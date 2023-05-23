@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "roscpp;gazebo_plugins".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "gazebo_utils"
-PROJECT_SPACE_DIR = "/home/hidalgo/TFG/ros/install"
+PROJECT_SPACE_DIR = "/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install"
 PROJECT_VERSION = "0.0.0"

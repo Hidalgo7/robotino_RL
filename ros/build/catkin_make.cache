@@ -1,2 +1,2 @@
 blob_segmentation:line_following:robots/robotino/robotino_2dnav:robots/robotino/robotino_description:robots/robotino/robotino_msgs:robots/robotino/robotino_node:robots/robotino/robotino_teleop_joy:simulation/gazebo_utils
--DCATKIN_DEVEL_PREFIX=/home/hidalgo/TFG/ros/devel -DCMAKE_INSTALL_PREFIX=/home/hidalgo/TFG/ros/install -G Unix Makefiles
+-DCATKIN_DEVEL_PREFIX=/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/devel -DCMAKE_INSTALL_PREFIX=/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/install -G Unix Makefiles
