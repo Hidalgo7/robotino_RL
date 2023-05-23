@@ -1,0 +1,8 @@
+<launch>
+	<!-- Keyboard Teleop Node -->
+	<node pkg="robotino_teleop_joy" type="robotino_teleop_keyboard" name="robotino_teleop_keyboard" output="screen" >
+		<!-- Scale -->
+		<param name="scale_linear" value="2.0" type="double" />
+		<param name="scale_angular" value="1.0" type="double" />
+	</node>
+</launch>

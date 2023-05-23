@@ -1,0 +1,51 @@
+<launch>
+
+  <!-- Setup arguments-> 0:deactivated, 1:activated -->
+
+  <arg name="use_rviz" value="1"/>
+	<arg name="use_joyteleop" value="0"/>
+  <arg name="use_keyboard" value="0"/>
+	<arg name="hostname" default="192.168.1.101" />
+
+  <!-- Launch robotino platform -->
+  <include file="$(find robotino_node)/launch/robotino_node.launch">
+    <arg name="hostname" value="$(arg hostname)" />
+  </include>
+
+  <!-- Run the map server (you can run it here or in another terminal) -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find robotino_2dnav)/map/mapa.yaml"/>
+
+  <!--- Run AMCL -->
+  <!--<include file="$(find robotino_2dnav)/launch/amcl.launch" />-->
+	<include file="$(find amcl)/examples/amcl_omni.launch" />
+  
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find robotino_2dnav)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find robotino_2dnav)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find robotino_2dnav)/config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find robotino_2dnav)/config/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find robotino_2dnav)/config/base_local_planner_params.yaml" command="load" />
+
+    <!--<param name="base_global_planner" type="string" value="NavfnROS" />
+    <param name="conservative_reset_dist" type="double" value="3.0" />
+    <param name="controller_frequency" type="double" value="15.0" />
+
+    <remap from="odom" to="amcl_pose" />-->
+  </node>
+
+  <!-- Launch joystick teleoperation -->
+  <group if="$(arg use_joyteleop)" > 
+    <include file="$(find robotino_teleop_joy)/launch/joystick_teleop.launch" />
+  </group>
+
+  <!-- Launch keyboard teleoperation -->
+  <group if="$(arg use_keyboard)" > 
+    <include file="$(find robotino_teleop_joy)/launch/keyboard_teleop.launch" />
+  </group>0
+
+  <!-- Launch rviz -->
+  <group if="$(arg use_rviz)">
+    <node name="rviz" pkg="rviz" type="rviz" args="-f map -d $(find robotino_2dnav)/config/robotino_nav.rviz" />
+  </group>
+  
+</launch>

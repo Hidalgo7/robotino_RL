@@ -1,0 +1,12 @@
+<launch>
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find robotino_description)/urdf/robotino.xacro" />
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <!-- <remap from="robot_description" to="robotino_description" /> -->
+  </node>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+    <!-- <remap from="robot_description" to="robotino_description" /> -->
+  </node>
+</launch>

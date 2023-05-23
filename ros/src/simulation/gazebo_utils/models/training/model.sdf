@@ -1,0 +1,32 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+
+  <model name='escenario'>
+    <pose>0 0 0 0 0 0</pose>
+    <static>true</static>
+    <link name="training">
+      <visual name="training">
+        <geometry>
+          <mesh><uri>model://training/meshes/training.dae</uri></mesh>
+        </geometry>
+      </visual>
+      <!-- <collision name="wall_collision">
+        <geometry>
+          <mesh><uri>model://circuito/meshes/circuito.dae</uri></mesh>
+        </geometry>
+      </collision> -->
+    </link>
+    <link name="plano">
+      <visual name="plano">
+        <geometry>
+          <mesh><uri>model://training/meshes/plano.dae</uri></mesh>
+        </geometry>
+      </visual>
+      <collision name="plano_collision">
+        <geometry>
+          <mesh><uri>model://training/meshes/plano.dae</uri></mesh>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

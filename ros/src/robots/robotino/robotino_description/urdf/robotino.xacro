@@ -1,0 +1,242 @@
+<?xml version="1.0"?>
+
+<robot
+  xmlns:xacro="http://www.ros.org/wiki/xacro" 
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+  name="robotino">
+  
+  <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+  <xacro:include filename="$(find robotino_description)/urdf/robotino.gazebo" />
+
+  <!-- Dummy link -->
+  <link name="base_footprint">
+    <visual>
+      <geometry>
+	      <cylinder radius="0.0001" length="0.0001" />
+      </geometry>
+    </visual>
+    <inertial>
+      <mass value="1"/>
+      <inertia ixx="100" ixy="0" ixz="0" iyy="100" iyz="0" izz="100"/>
+    </inertial>
+  </link>
+  
+  <!-- Base -->
+  <link name="base_link">
+    <inertial>
+      <mass value="20"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.570795" xyz="0.01 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoBody.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 1.570795" xyz="0.01 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoBody.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="base_footprint_to_base_link" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Wheel 0 -->
+  <link name="wheel0_link">
+    <inertial>
+      <mass value="0.00001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoWheel.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoWheel.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="wheel0_joint" type="continuous">
+    <origin rpy="0 0 1.04719666667" xyz="0.065 0.11 0.04"/>
+    <axis xyz="-1 0 0"/>
+    <parent link="base_link"/>
+    <child link="wheel0_link"/>
+  </joint>
+
+  
+  <!-- Wheel 1 -->
+  <link name="wheel1_link">
+    <inertial>
+      <mass value="0.00001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoWheel.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoWheel.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="wheel1_joint" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.13 0 0.04"/>
+    <axis xyz="1 0 0"/>
+    <parent link="base_link"/>
+    <child link="wheel1_link"/>
+  </joint>
+
+  <!-- Wheel 2 -->
+  <link name="wheel2_link">
+    <inertial>
+      <mass value="0.00001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoWheel.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoWheel.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="wheel2_joint" type="continuous">
+    <origin rpy="0 0 -1.04719666667" xyz="0.065 -0.11 0.04"/>
+    <axis xyz="-1 0 0"/>
+    <parent link="base_link"/>
+    <child link="wheel2_link"/>
+  </joint>
+
+  <!-- Command Bridge -->
+  <link name="command_bridge_link">
+    <inertial>
+      <mass value="0.00001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.25 0.11 0.16"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="command_bridge_joint" type="fixed">
+    <origin rpy="0 0 1.570795" xyz="-0.05 0 0.13"/>
+    <parent link="base_link"/>
+    <child link="command_bridge_link"/>
+  </joint>
+
+  <!-- Angle Bracket USB Hub -->
+  <link name="anglebracketusb_link">
+    <inertial>
+      <mass value="0.00001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/AngleBracketUSBHub.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/AngleBracketUSBHub.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="anglebracketusb_joint" type="fixed">
+    <origin rpy="0 0 1.570795" xyz="0.008 0 0.137"/>
+    <parent link="base_link"/>
+    <child link="anglebracketusb_link"/>
+  </joint>
+
+  <!-- Laser-->
+  <link name="laser_link">
+    <inertial>
+      <mass value="0.00001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.570795" xyz="0 0 -0.06"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoLaserScanner.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 1.570795" xyz="0 0 -0.06"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoLaserScanner.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="laser_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.15 0 0.11"/>
+    <parent link="base_link"/>
+    <child link="laser_link"/>
+  </joint>
+  
+  <!-- Camera -->
+  <link name="camera_link">
+    <inertial>
+      <mass value="0.00001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.57" xyz="-0.05 0 -0.1"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoCamera.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robotino_description/meshes/RobotinoCamera.dae" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="camera_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.1 0 0.2"/>
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+  </joint>
+  
+
+  
+  
+</robot>

@@ -1,0 +1,14 @@
+<launch>
+ 
+    <include file="$(find gazebo_utils)/launch/linefollow.launch">
+        <arg name="robotino" default="true"/>
+    </include>
+    <!-- Image segmentation -->
+    <include file="$(find blob_segmentation)/launch/segment.launch"/>
+
+    <!-- Training -->
+    <node pkg="line_following" name="linefollow" type="linefollow.py" output="screen">
+    </node>
+
+  
+</launch>

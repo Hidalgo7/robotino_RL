@@ -1,0 +1,41 @@
+<launch>
+
+  <!-- Setup arguments-> 0:deactivated, 1:activated -->
+
+  <arg name="use_rviz" value="1"/>
+	<arg name="use_joyteleop" value="0"/>
+  <arg name="use_keyboard" value="1"/>
+	<arg name="hostname" default="192.168.1.101" />
+
+  <!-- Launch robotino platform -->
+  <include file="$(find robotino_node)/launch/robotino_node.launch">
+    <arg name="hostname" value="$(arg hostname)" />
+  </include>
+  
+  <!-- Launch gmapping node -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" args="/scan">
+    <param name="delta" type="double" value="0.05" />
+    <param name="temporalUpdate" type="double" value="2.5" />
+    <param name="xmin" type="double" value="-2" />
+    <param name="xmax" type="double" value="2" />
+    <param name="ymin" type="double" value="-2" />
+    <param name="ymax" type="double" value="2" />
+  </node>
+
+  <!-- Launch joystick teleoperation -->
+  <group if="$(arg use_joyteleop)" > 
+    <include file="$(find robotino_teleop_joy)/launch/joystick_teleop.launch" />
+  </group>
+
+  <!-- Launch keyboard teleoperation -->
+  <group if="$(arg use_keyboard)" > 
+    <include file="$(find robotino_teleop_joy)/launch/keyboard_teleop.launch" />
+  </group>
+
+  <!-- Launch rviz -->
+  <group if="$(arg use_rviz)">
+    <node name="rviz" pkg="rviz" type="rviz" args="-f map -d $(find robotino_2dnav)/config/robotino_nav.rviz" />
+  </group>
+
+</launch>
+

@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+	<world name="default">
+    		<!-- Simple world  model -->
+		<include>
+			<uri>model://training</uri>
+			<name>training</name>
+			<pose>0 0 0 0 0 0</pose>
+		</include>
+		
+		<include>
+			<uri>model://sun</uri>
+		</include>
+
+		<!-- A ground plane -->
+		<include>
+			<uri>model://ground_plane</uri>
+		</include>
+ 
+		<scene>
+			<grid>false</grid>
+		</scene>
+	</world>
+</sdf>

@@ -1,0 +1,33 @@
+<launch>
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+
+  <arg name="robotino" default="true"/> 
+  <arg name="turtlebot" default="false"/>
+  <arg name="tartalo" default="false"/>
+  <arg name="rviz" default="false"/>
+
+  <env name="GAZEBO_MODEL_PATH" value="$(find gazebo_utils)/models:$GAZEBO_MODEL_PATH"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find gazebo_utils)/worlds/test.world"/>
+    <arg name="use_sim_time" value="false"/>
+    <!-- more default parameters can be changed here -->
+  </include>
+
+
+  <group if="$(arg robotino)">
+    <!-- Run transforms -->
+    <!-- param name="tf_prefix" value="robotino"/-->
+    <include file="$(find robotino_description)/launch/robotino_description.launch"/>
+
+    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf -model robotino -param robot_description -x 4.525 -y 2.989 -z 0.15 -Y -0.1413"/>
+
+    <!-- Visualize Rviz -->
+    <group if="$(arg rviz)">
+      <node type="rviz" name="rviz" pkg="rviz" args="-d $(find gazebo_utils)/rviz/robotino.rviz" />
+    </group>
+  </group>
+  
+</launch>
