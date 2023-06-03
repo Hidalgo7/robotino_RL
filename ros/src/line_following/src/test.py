@@ -4,7 +4,6 @@ import gym
 import rospy
 import rospkg
 import os
-from stable_baselines3.common.env_checker import check_env
 from stable_baselines3 import DDPG
 from stable_baselines3.common.evaluation import evaluate_policy
 
@@ -35,7 +34,7 @@ def main():
     timesteps = rospy.get_param("~timesteps",100000)
 
 
-    env = gym.make('GazeboRobotinoEnv-v0')
+    env = gym.make('GazeboRobotinoTestEnv-v0')
 
     models_path = line_following_pkg + "/models/"
     version_num = str(get_version_number(models_path)-1)
@@ -47,7 +46,7 @@ def main():
     # to compare the system on which the model was trained vs the current one
     # model = DQN.load("dqn_lunar", env=env, print_system_info=True)
     model = DDPG.load(models_path + model_name, env=env)
-    print("Model loaded")
+    print("Model ", model_name, " loaded")
 
     # Evaluate the agent
     # NOTE: If you use wrappers with your environment that modify rewards,

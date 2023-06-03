@@ -28,15 +28,15 @@ def main():
     # get the file path for rospy_tutorials
     line_following_pkg = rospack.get_path('line_following')
 
-    reward_th = rospy.get_param("~reward_threshold", -200)
+    reward_th = rospy.get_param("~reward_threshold", -100)
     policy = rospy.get_param("~policy", 0)
     buff_size = rospy.get_param("~buff_size",10000)
     train_hz = rospy.get_param("~train_hz",3)
-    timesteps = rospy.get_param("~timesteps",100000)
+    timesteps = rospy.get_param("~timesteps",200000)
 
     policies = [MlpPolicy, CnnPolicy, MultiInputPolicy]
 
-    env = gym.make('GazeboRobotinoEnv-v0')
+    env = gym.make('GazeboRobotinoTrainEnv-v0')
     print("Environment loaded")
     # check_env(env,warn=True,skip_render_check=True)
     stop_training = StopTrainingOnRewardThreshold(reward_threshold=reward_th,verbose=1)
