@@ -34,6 +34,10 @@ def main():
     train_hz = rospy.get_param("~train_hz",3)
     timesteps = rospy.get_param("~timesteps",200000)
 
+    print(">>>>>>>>>> reward_th: ", reward_th)
+    print(">>>>>>>>>> timesteps: ", timesteps)
+
+
     policies = [MlpPolicy, CnnPolicy, MultiInputPolicy]
 
     env = gym.make('GazeboRobotinoTrainEnv-v0')

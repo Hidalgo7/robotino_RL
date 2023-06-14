@@ -1,7 +1,7 @@
 <launch>
  
     <!-- Launch world -->
-    <include file="$(find gazebo_utils)/launch/linefollow.launch"/>
+    <include file="$(find gazebo_utils)/launch/test_world.launch"/>
     <!-- Image segmentation -->
     <include file="$(find blob_segmentation)/launch/segment.launch"/>
     <!-- Testing -->

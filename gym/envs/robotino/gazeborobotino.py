@@ -13,8 +13,8 @@ from sensor_msgs.msg import Image
 from std_srvs.srv import Empty
 from cv_bridge import CvBridge
 
-segment_blob_path = '/home/hidalgo/TFG/ros/src/blob_segmentation/scripts'
-#segment_blob_path = '/home/bee/irakaskuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/blob_segmentation/scripts'
+#segment_blob_path = '/home/hidalgo/TFG/ros/src/blob_segmentation/scripts'
+segment_blob_path = '/home/bee/ikerkuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/blob_segmentation/scripts'
 sys.path.append(segment_blob_path)
 import segment_blob
 
@@ -54,9 +54,9 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
                                             shape=(self.image_height,self.image_width,3), dtype=np.uint8)
 
         # Define action space
-        self.max_linear_speed = 0.5
-        self.min_linear_speed = 0.1
-        self.max_angular_speed = 0.3
+        self.max_linear_speed = 0.4
+        self.min_linear_speed = 0.05
+        self.max_angular_speed = 0.5
 
         self.action_space = spaces.Box(low=np.array([self.min_linear_speed, -self.max_angular_speed]),
                                         high=np.array([self.max_linear_speed, self.max_angular_speed]),
@@ -72,8 +72,8 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         self.num_circuits = 0
         self.circuits = []
 
-        circuits_path = "/home/hidalgo/.local/lib/python3.8/site-packages/gym/envs/robotino/circuits.json"
-        #circuits_path = "/usr/local/lib/python3.8/dist-packages/gym/envs/robotino/circuits.json"
+        #circuits_path = "/home/hidalgo/.local/lib/python3.8/site-packages/gym/envs/robotino/circuits.json"
+        circuits_path = "/usr/local/lib/python3.8/dist-packages/gym/envs/robotino/circuits.json"
         f = open(circuits_path)
         data = json.load(f)
 
@@ -86,6 +86,18 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         self.steps = 0
 
         self.reset()
+
+    def array_max_index(self, array):
+        index_max = None
+        max_val = float('-inf')
+
+        for i, subarray in enumerate(array):
+            max_subarray = max(subarray)
+            if max_subarray > max_val:
+                max_val = max_subarray
+                index_max = i
+
+        return index_max
 
     def step(self, action):
         rospy.wait_for_service('/gazebo/unpause_physics')
@@ -128,20 +140,27 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
             
             if not segment_blob.detectLine(data):
                 done = True
-                reward = -1000 + self.steps
+                reward = -2000 + self.steps
                 self.steps = 0
                 print("Line lost")
             else:
                 done = False
                 self.steps += 1
-                fila = state[(int)(0.8*self.image_height),:,:]
-                indice = np.argmax(fila != [0,0,0])
+
+                #print("Width: ", self.image_width)
+                
+                fila = state[(int)(0.95*self.image_height),:,:]
+                #print("Fila: ", type(fila))
+                indice = self.array_max_index(fila)
+                #indice = np.argmax(fila != [0,0,0])
+                #print("Indice: ", indice)
                 diff = abs(self.image_width/2-indice)
-                if diff < self.image_width*0.1:
+                #print("Diff: ", diff)
+                if diff < self.image_width*0.05:
                     reward = 1
                 else:
                     reward = 0
-
+                #print("Reward: ", reward)
                 reward -= 1.01
         
         return state, reward, done, {}
@@ -219,9 +238,9 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
                                             shape=(self.image_height,self.image_width,3), dtype=np.uint8)
         
         # Define action space
-        self.max_linear_speed = 0.5
-        self.min_linear_speed = 0.1
-        self.max_angular_speed = 0.3
+        self.max_linear_speed = 0.4
+        self.min_linear_speed = 0.05
+        self.max_angular_speed = 0.5
 
         self.action_space = spaces.Box(low=np.array([self.min_linear_speed, -self.max_angular_speed]),
                                         high=np.array([self.max_linear_speed, self.max_angular_speed]),
@@ -240,6 +259,18 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
         self.finish_x = 3.5845
         self.finish_y = 3.1228
 
+    def array_max_index(self, array):
+        index_max = None
+        max_val = float('-inf')
+
+        for i, subarray in enumerate(array):
+            max_subarray = max(subarray)
+            if max_subarray > max_val:
+                max_val = max_subarray
+                index_max = i
+
+        return index_max
+    
     def step(self, action):
         
         rospy.wait_for_service('/gazebo/unpause_physics')
@@ -282,18 +313,21 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
         else:
             if not segment_blob.detectLine(data):
                 done = True
+                print("Steps:", self.steps) 
                 reward = -1000 + self.steps
                 self.steps = 0
                 print("Line lost")
             else:
                 done = False
-                fila = state[(int)(0.8*self.image_height),:,:]
-                indice = np.argmax(fila != [0,0,0])
+                fila = state[(int)(0.95*self.image_height),:,:]
+                #indice = np.argmax(fila != [0,0,0])
+                indice = self.array_max_index(fila)
                 diff = abs(self.image_width/2-indice)
-                if diff < self.image_width*0.1:
+                #print("Diff: ", diff)
+                if diff < self.image_width*0.05:
                     reward = 1
                 else:
-                    reward = -1
+                    reward = 0
 
                 reward -= 1.01
         
