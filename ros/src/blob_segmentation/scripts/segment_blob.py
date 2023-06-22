@@ -21,7 +21,7 @@ class blobDetection:
     def callback(self, msg):
         try:
             cv_img = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            resized = cv2.resize(cv_img.copy(),(64,48),interpolation=cv2.INTER_AREA)
+            resized = cv2.resize(cv_img.copy(),(128,96),interpolation=cv2.INTER_AREA)
             img_filtered = self.colorFilter(resized)
             cv2.imshow("Resized filtered",img_filtered)
             msg = self.bridge.cv2_to_imgmsg(img_filtered,)

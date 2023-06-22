@@ -1,0 +1,12 @@
+<launch>
+ 
+    <!-- Launch world -->
+    <include file="$(find gazebo_utils)/launch/training_world.launch"/>
+    <!-- Image segmentation -->
+    <include file="$(find blob_segmentation)/launch/segment.launch"/>
+    <!-- Pruebas -->
+    <node pkg="pruebas" name="pruebas" type="mover_robot.py" output="screen">
+    </node>
+
+  
+</launch>

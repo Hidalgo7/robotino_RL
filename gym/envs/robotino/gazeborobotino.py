@@ -133,14 +133,14 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
 
         if (abs(x_pos - self.start_circuit.finish_x) < 0.1 and abs(y_pos -  self.start_circuit.finish_y) < 0.1):
             done = True
-            reward = 0
+            reward = -self.steps
             self.steps = 0
             print("Objective reached")
         else:
             
             if not segment_blob.detectLine(data):
                 done = True
-                reward = -2000 + self.steps
+                reward = min(-1000 + self.steps,-500)
                 self.steps = 0
                 print("Line lost")
             else:
@@ -157,11 +157,10 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
                 diff = abs(self.image_width/2-indice)
                 #print("Diff: ", diff)
                 if diff < self.image_width*0.05:
-                    reward = 1
-                else:
                     reward = 0
+                else:
+                    reward = -diff
                 #print("Reward: ", reward)
-                reward -= 1.01
         
         return state, reward, done, {}
 
@@ -306,7 +305,7 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
 
         if (abs(x_pos - self.finish_x) < 0.1 and abs(y_pos -  self.finish_y) < 0.1):
             done = True
-            reward = 0
+            reward = -self.steps
             self.steps = 0
             print("Objective reached")
             
@@ -314,7 +313,7 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
             if not segment_blob.detectLine(data):
                 done = True
                 print("Steps:", self.steps) 
-                reward = -1000 + self.steps
+                reward = min(-1000 + self.steps, -500)
                 self.steps = 0
                 print("Line lost")
             else:
@@ -325,11 +324,9 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
                 diff = abs(self.image_width/2-indice)
                 #print("Diff: ", diff)
                 if diff < self.image_width*0.05:
-                    reward = 1
-                else:
                     reward = 0
-
-                reward -= 1.01
+                else:
+                    reward = -diff
         
         return state, reward, done, {}
     
