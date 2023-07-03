@@ -41,8 +41,7 @@ class blobDetection:
         return filtered_img
 
 def detectLine(image):
-    cv_img = CvBridge().imgmsg_to_cv2(image)
-    cv_copy = cv_img.copy()
+    cv_copy = image.copy()
     hsv = cv2.cvtColor(cv_copy,cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv,np.array([0,50,50]),np.array([70,255,255]))
 

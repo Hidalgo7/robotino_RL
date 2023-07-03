@@ -47,8 +47,8 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         self.get_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
 
         # Define observation_space
-        self.image_width = 64
-        self.image_height = 48
+        self.image_width = 128
+        self.image_height = 96
 
         self.observation_space = spaces.Box(low=0, high=255,
                                             shape=(self.image_height,self.image_width,3), dtype=np.uint8)
@@ -85,6 +85,9 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         # Steps per episode counter
         self.steps = 0
 
+        self.rotation_buffer = []
+        self.rotation_buffer_length = 10
+
         self.reset()
 
     def array_max_index(self, array):
@@ -98,6 +101,77 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
                 index_max = i
 
         return index_max
+    
+    def calculate_reward(self,state):
+        # Se obtiene la posicion (x,y) del robot
+        robotino_coordinates = self.get_state('robotino','')
+        x_pos = robotino_coordinates.pose.position.x
+        y_pos = robotino_coordinates.pose.position.y
+
+        if (abs(x_pos - self.start_circuit.finish_x) < 0.1 and abs(y_pos -  self.start_circuit.finish_y) < 0.1):
+            # Si la posicion del robot es igual a la meta del circuito (con un error posible de 0.1 en cada eje)
+            # se finaliza el episodio con una recompensa neutra.
+            done = True
+            reward = -self.steps
+            self.steps = 0
+            print("Objective reached")
+        else:
+            if not segment_blob.detectLine(state):
+                # Si no se detecta la linea en camara se finaliza el episodio con una recompensa negativa variable
+                # en funcion de los pasos realizados, penalizando menos al robot si ha conseguido llegar mas lejos 
+                # en el circuito (mas pasos).
+                done = True
+                reward = min(-1000 + self.steps,-500)
+                self.steps = 0
+                print("Line lost")
+            else:
+                # Si no se da ninguno de los casos anteriores el episodio continua. La recompensa se calcula en 
+                # funcion de la desviacion de la linea al centro de la camara y el numero de oscilaciones en las 
+                # ultimas 10 acciones. Se normalizan ambas en el rango [0,1] y se le aplica un peso proporcional
+                # a cada recompensa individual para calcular la recompensa total.
+                done = False
+                self.steps += 1 
+                fila = state[(int)(0.95*self.image_height),:,:]
+                indice = self.array_max_index(fila)
+                diff = abs(self.image_width/2-indice)
+                desv_linea = -diff / (self.image_width/2)
+
+                #print("Width: ", self.image_width)
+                #print("Fila: ", type(fila))
+                #print("Indice: ", indice)
+                #print("Diff: ", diff)
+                #print("Desviacion linea: ", desv_linea)
+
+                # Evaluar los cambios de direccion
+                i = 0
+                j = 1
+
+                cambios_direccion = 0
+                
+                while j < len(self.rotation_buffer): # Mientras el segundo indice sea menor que la longitud del buffer
+                    vel_ang_1 = self.rotation_buffer[i]
+                    vel_ang_2 = self.rotation_buffer[j]
+
+                    if vel_ang_1 * vel_ang_2 < 0: 
+                        # Si las dos velocidades angulares tienen diferente signo, hay un cambio de direccion
+                        cambios_direccion += 1
+                    i += 1
+                    j += 1
+                
+                if cambios_direccion > 1:
+                    # Si hay mas de un cambio de direccion se penaliza (con normalizacion)
+                    cambios_direccion -= 1
+                    oscilaciones = -cambios_direccion / (len(self.rotation_buffer)-2)
+                else:
+                    # En caso contrario (un cambio o ninguno), no se penaliza
+                    oscilaciones = 0
+
+                reward = desv_linea * 0.8 + oscilaciones * 0.2 # Proporcion 80/20
+                #reward = desv_linea * 0.5 + oscilaciones * 0.5 # Proporcion 50/50
+
+                #print("Recompensa: {}".format(reward))
+
+        return reward,done
 
     def step(self, action):
         rospy.wait_for_service('/gazebo/unpause_physics')
@@ -124,44 +198,17 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
             self.pause()
         except:
             print('/gazebo/pause_physics service call failed')
-        
+
+        if len(self.rotation_buffer) == self.rotation_buffer_length:
+            self.rotation_buffer.pop(0)
+            self.rotation_buffer.append(action[1])
+        else:
+            self.rotation_buffer.append(action[1])
+
         state = CvBridge().imgmsg_to_cv2(data)
 
-        robotino_coordinates = self.get_state('robotino','')
-        x_pos = robotino_coordinates.pose.position.x
-        y_pos = robotino_coordinates.pose.position.y
+        reward,done = self.calculate_reward(state)   
 
-        if (abs(x_pos - self.start_circuit.finish_x) < 0.1 and abs(y_pos -  self.start_circuit.finish_y) < 0.1):
-            done = True
-            reward = -self.steps
-            self.steps = 0
-            print("Objective reached")
-        else:
-            
-            if not segment_blob.detectLine(data):
-                done = True
-                reward = min(-1000 + self.steps,-500)
-                self.steps = 0
-                print("Line lost")
-            else:
-                done = False
-                self.steps += 1
-
-                #print("Width: ", self.image_width)
-                
-                fila = state[(int)(0.95*self.image_height),:,:]
-                #print("Fila: ", type(fila))
-                indice = self.array_max_index(fila)
-                #indice = np.argmax(fila != [0,0,0])
-                #print("Indice: ", indice)
-                diff = abs(self.image_width/2-indice)
-                #print("Diff: ", diff)
-                if diff < self.image_width*0.05:
-                    reward = 0
-                else:
-                    reward = -diff
-                #print("Reward: ", reward)
-        
         return state, reward, done, {}
 
 
@@ -254,6 +301,10 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
         # Steps per episode counter
         self.steps = 0
 
+        # Rotation buffer
+        self.rotation_buffer = []
+        self.rotation_buffer_length = 10
+
         # Finishing coordinates
         self.finish_x = 3.5845
         self.finish_y = 3.1228
@@ -270,8 +321,78 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
 
         return index_max
     
+    def calculate_reward(self,state):
+        # Se obtiene la posicion (x,y) del robot
+        robotino_coordinates = self.get_state('robotino','')
+        x_pos = robotino_coordinates.pose.position.x
+        y_pos = robotino_coordinates.pose.position.y
+
+        if (abs(x_pos - self.start_circuit.finish_x) < 0.1 and abs(y_pos -  self.start_circuit.finish_y) < 0.1):
+            # Si la posicion del robot es igual a la meta del circuito (con un error posible de 0.1 en cada eje)
+            # se finaliza el episodio con una recompensa neutra.
+            done = True
+            reward = -self.steps
+            self.steps = 0
+            print("Objective reached")
+        else:
+            if not segment_blob.detectLine(state):
+                # Si no se detecta la linea en camara se finaliza el episodio con una recompensa negativa variable
+                # en funcion de los pasos realizados, penalizando menos al robot si ha conseguido llegar mas lejos 
+                # en el circuito (mas pasos).
+                done = True
+                reward = min(-1000 + self.steps,-500)
+                self.steps = 0
+                print("Line lost")
+            else:
+                # Si no se da ninguno de los casos anteriores el episodio continua. La recompensa se calcula en 
+                # funcion de la desviacion de la linea al centro de la camara y el numero de oscilaciones en las 
+                # ultimas 10 acciones. Se normalizan ambas en el rango [0,1] y se le aplica un peso proporcional
+                # a cada recompensa individual para calcular la recompensa total.
+                done = False
+                self.steps += 1 
+                fila = state[(int)(0.95*self.image_height),:,:]
+                indice = self.array_max_index(fila)
+                diff = abs(self.image_width/2-indice)
+                desv_linea = -diff / (self.image_width/2)
+
+                #print("Width: ", self.image_width)
+                #print("Fila: ", type(fila))
+                #print("Indice: ", indice)
+                #print("Diff: ", diff)
+                #print("Desviacion linea: ", desv_linea)
+
+                # Evaluar los cambios de direccion
+                i = 0
+                j = 1
+
+                cambios_direccion = 0
+                
+                while j < len(self.rotation_buffer): # Mientras el segundo indice sea menor que la longitud del buffer
+                    vel_ang_1 = self.rotation_buffer[i]
+                    vel_ang_2 = self.rotation_buffer[j]
+
+                    if vel_ang_1 * vel_ang_2 < 0: 
+                        # Si las dos velocidades angulares tienen diferente signo, hay un cambio de direccion
+                        cambios_direccion += 1
+                    i += 1
+                    j += 1
+                
+                if cambios_direccion > 1:
+                    # Si hay mas de un cambio de direccion se penaliza (con normalizacion)
+                    cambios_direccion -= 1
+                    oscilaciones = -cambios_direccion / (len(self.rotation_buffer)-2)
+                else:
+                    # En caso contrario (un cambio o ninguno), no se penaliza
+                    oscilaciones = 0
+
+                reward = desv_linea * 0.8 + oscilaciones * 0.2 # Proporcion 80/20
+                #reward = desv_linea * 0.5 + oscilaciones * 0.5 # Proporcion 50/50
+
+                #print("Recompensa: {}".format(reward))
+
+        return reward,done
+
     def step(self, action):
-        
         rospy.wait_for_service('/gazebo/unpause_physics')
         try:
             self.unpause()
@@ -296,38 +417,17 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
             self.pause()
         except:
             print('/gazebo/pause_physics service call failed')
-        
+
+        if len(self.rotation_buffer) == self.rotation_buffer_length:
+            self.rotation_buffer.pop(0)
+            self.rotation_buffer.append(action[1])
+        else:
+            self.rotation_buffer.append(action[1])
+
         state = CvBridge().imgmsg_to_cv2(data)
 
-        robotino_coordinates = self.get_state('robotino','')
-        x_pos = robotino_coordinates.pose.position.x
-        y_pos = robotino_coordinates.pose.position.y
+        reward,done = self.calculate_reward(state)   
 
-        if (abs(x_pos - self.finish_x) < 0.1 and abs(y_pos -  self.finish_y) < 0.1):
-            done = True
-            reward = -self.steps
-            self.steps = 0
-            print("Objective reached")
-            
-        else:
-            if not segment_blob.detectLine(data):
-                done = True
-                print("Steps:", self.steps) 
-                reward = min(-1000 + self.steps, -500)
-                self.steps = 0
-                print("Line lost")
-            else:
-                done = False
-                fila = state[(int)(0.95*self.image_height),:,:]
-                #indice = np.argmax(fila != [0,0,0])
-                indice = self.array_max_index(fila)
-                diff = abs(self.image_width/2-indice)
-                #print("Diff: ", diff)
-                if diff < self.image_width*0.05:
-                    reward = 0
-                else:
-                    reward = -diff
-        
         return state, reward, done, {}
     
     def reset(self):

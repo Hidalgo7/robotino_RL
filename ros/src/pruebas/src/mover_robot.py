@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
+import random
 import rospy
 import curses
 import time
 import sys
-import io
 import json
 
+from geometry_msgs.msg import Twist
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.srv import GetModelState
@@ -35,6 +36,9 @@ class Circuit:
 
 class Robot():
     def __init__(self):
+        self.cmd_vel_topic = "/cmd_vel"
+        self.vel_pub = rospy.Publisher(self.cmd_vel_topic, Twist, queue_size=5)
+
         self.unpause = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
         self.pause = rospy.ServiceProxy('/gazebo/pause_physics', Empty)
         self.reset_proxy = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
@@ -59,6 +63,9 @@ class Robot():
             self.num_circuits += 1
             new_circuit = Circuit(circuit['start_position'], circuit['finish_position'])
             self.circuits.append(new_circuit)
+
+        self.rotation_buffer = []
+        self.rotation_buffer_length = 10
 
     def array_max_index(self, array):
         index_max = None
@@ -138,7 +145,30 @@ class Robot():
             print("/gazebo/set_model_state service call failed")
 
         #print("X: {}\n Y:{}".format(x_pos,y_pos))
+    
+    def rotar_random(self):
 
+        nueva_vel_ang = round(random.uniform(-0.5,0.5),2)
+
+        print("Velocidad angular: {}".format(nueva_vel_ang))
+        
+        vel_cmd = Twist()
+        vel_cmd.angular.z = nueva_vel_ang
+
+        self.vel_pub.publish(vel_cmd)
+
+        time.sleep(0.5)
+
+        vel_cmd.angular.z = 0
+        self.vel_pub.publish(vel_cmd)
+
+        if len(self.rotation_buffer) == self.rotation_buffer_length:
+            self.rotation_buffer.pop(0)
+            self.rotation_buffer.append(nueva_vel_ang)
+        else:
+            self.rotation_buffer.append(nueva_vel_ang)
+
+        print("Buffer: ", self.rotation_buffer)
 
     def recompensa(self):
 
@@ -170,13 +200,35 @@ class Robot():
             #indice = np.argmax(fila != [0,0,0])
             #print("Indice: ", indice)
             diff = abs(self.image_width/2-indice) 
-            #print("Diff: ", diff)
-            print("Treshold: ", self.image_width*0.05)
-            if diff < self.image_width*0.05:
-                reward = 0
+            print("Diff: ", diff)
+            #print("Treshold: ", self.image_width*0.05)
+            reward = -diff / (self.image_width/2)
+            print("Penalizacion linea: ", reward)
+
+            # Evaluar los cambios de direccion
+            i = 0
+            j = 1
+
+            cambios_direccion = 0 # Se inicializa a -1 ya que si hay un unico cambio de direccion la recompensa es 0
+            
+            while j < len(self.rotation_buffer): # Mientras el segundo indice sea menor que la longitud del buffer
+                vel_ang_1 = self.rotation_buffer[i]
+                vel_ang_2 = self.rotation_buffer[j]
+
+                # Si las dos velocidades angulares tienen diferente signo, hay un cambio de direccion
+                if vel_ang_1 * vel_ang_2 < 0: 
+                    cambios_direccion += 1
+                    print("Cambio de direccion: {} -> {}".format(vel_ang_1,vel_ang_2))
+                i += 1
+                j += 1
+
+            if cambios_direccion > 1:
+                cambios_direccion -= 1
+                recompensa = -cambios_direccion / (len(self.rotation_buffer)-2)
             else:
-                reward = -diff 
-            print("Reward: ", reward)
+                recompensa = 0
+
+            print("Penalizacion oscilacion: {}".format(recompensa))
             
     
     def get_pose(self):
@@ -249,11 +301,17 @@ if __name__ == "__main__":
             if char in direcciones:
                 robot.mover(char)
                 robot.recompensa()
-                #print("Robot movido")
-            elif char == 'q':
-                robot.rotar('+')
-            elif char == 'e':
-                robot.rotar('-')
+                print("Robot movido")
+            # elif char == 'q':
+            #     robot.rotar('+')
+            # elif char == 'e':
+            #     robot.rotar('-')
+            elif char == 'r':
+                robot.rotar_random()
+                robot.recompensa()
+            elif char == 'o':
+                robot.prueba_buffer()
+                robot.recompensa()
             elif char == 'p':
                 robot.get_pose()
             elif char == 'n':
