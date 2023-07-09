@@ -16,8 +16,8 @@ from sensor_msgs.msg import Image
 from std_srvs.srv import Empty
 from cv_bridge import CvBridge
 
-segment_blob_path = '/home/hidalgo/TFG/ros/src/blob_segmentation/scripts'
-#segment_blob_path = '/home/bee/ikerkuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/blob_segmentation/scripts'
+#segment_blob_path = '/home/hidalgo/TFG/ros/src/blob_segmentation/scripts'
+segment_blob_path = '/home/bee/ikerkuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/blob_segmentation/scripts'
 sys.path.append(segment_blob_path)
 import segment_blob
 
@@ -75,8 +75,8 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         self.num_circuits = 0
         self.circuits = []
 
-        circuits_path = "/home/hidalgo/.local/lib/python3.8/site-packages/gym/envs/robotino/circuits.json"
-        #circuits_path = "/usr/local/lib/python3.8/dist-packages/gym/envs/robotino/circuits.json"
+        #circuits_path = "/home/hidalgo/.local/lib/python3.8/site-packages/gym/envs/robotino/circuits.json"
+        circuits_path = "/usr/local/lib/python3.8/dist-packages/gym/envs/robotino/circuits.json"
         f = open(circuits_path)
         data = json.load(f)
 
