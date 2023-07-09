@@ -1,7 +1,10 @@
 import rospy
+import rospkg
 import json
 import numpy as np
 import sys
+import os
+from datetime import date
 
 from gym import spaces
 from gym.envs.robotino import gazebo_env
@@ -13,8 +16,8 @@ from sensor_msgs.msg import Image
 from std_srvs.srv import Empty
 from cv_bridge import CvBridge
 
-#segment_blob_path = '/home/hidalgo/TFG/ros/src/blob_segmentation/scripts'
-segment_blob_path = '/home/bee/ikerkuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/blob_segmentation/scripts'
+segment_blob_path = '/home/hidalgo/TFG/ros/src/blob_segmentation/scripts'
+#segment_blob_path = '/home/bee/ikerkuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/ros/src/blob_segmentation/scripts'
 sys.path.append(segment_blob_path)
 import segment_blob
 
@@ -72,8 +75,8 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         self.num_circuits = 0
         self.circuits = []
 
-        #circuits_path = "/home/hidalgo/.local/lib/python3.8/site-packages/gym/envs/robotino/circuits.json"
-        circuits_path = "/usr/local/lib/python3.8/dist-packages/gym/envs/robotino/circuits.json"
+        circuits_path = "/home/hidalgo/.local/lib/python3.8/site-packages/gym/envs/robotino/circuits.json"
+        #circuits_path = "/usr/local/lib/python3.8/dist-packages/gym/envs/robotino/circuits.json"
         f = open(circuits_path)
         data = json.load(f)
 
@@ -85,8 +88,26 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         # Steps per episode counter
         self.steps = 0
 
-        self.rotation_buffer = []
-        self.rotation_buffer_length = 10
+        # self.rotation_buffer = []
+        # self.rotation_buffer_length = 10
+
+        self.step_reward = -1 # Constante asociada a la reward por cada step
+        
+        self.episode_reward = 0
+        self.num_episodes = 1
+
+        # Fichero para guardar las recompensas de los episodios
+        rospack = rospkg.RosPack()
+
+        model_path = rospack.get_path("line_following") + "/models/" + str(date.today()) + "-v0"
+                
+        while os.path.exists(model_path):
+            model_path = model_path[:-1] + str(int(model_path[-1])+1)
+                
+        os.makedirs(model_path)
+
+        self.reward_file_path = model_path + "/rewards.txt"
+        
 
         self.reset()
 
@@ -112,7 +133,7 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
             # Si la posicion del robot es igual a la meta del circuito (con un error posible de 0.1 en cada eje)
             # se finaliza el episodio con una recompensa neutra.
             done = True
-            reward = -self.steps
+            reward = 0
             self.steps = 0
             print("Objective reached")
         else:
@@ -130,11 +151,15 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
                 # ultimas 10 acciones. Se normalizan ambas en el rango [0,1] y se le aplica un peso proporcional
                 # a cada recompensa individual para calcular la recompensa total.
                 done = False
-                self.steps += 1 
+                self.steps += 1
                 fila = state[(int)(0.95*self.image_height),:,:]
                 indice = self.array_max_index(fila)
                 diff = abs(self.image_width/2-indice)
-                desv_linea = -diff / (self.image_width/2)
+
+                if diff < self.image_width*0.05: # Se permite un error del 5% de la anchura de la imagen 
+                    desv_linea = 0
+                else:
+                    desv_linea = (-diff + self.image_width/2) / ((self.image_width/2) - self.image_width*0.05) -1
 
                 #print("Width: ", self.image_width)
                 #print("Fila: ", type(fila))
@@ -143,31 +168,30 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
                 #print("Desviacion linea: ", desv_linea)
 
                 # Evaluar los cambios de direccion
-                i = 0
-                j = 1
+                # i = 0
+                # j = 1
 
-                cambios_direccion = 0
+                # cambios_direccion = 0
                 
-                while j < len(self.rotation_buffer): # Mientras el segundo indice sea menor que la longitud del buffer
-                    vel_ang_1 = self.rotation_buffer[i]
-                    vel_ang_2 = self.rotation_buffer[j]
+                # while j < len(self.rotation_buffer): # Mientras el segundo indice sea menor que la longitud del buffer
+                #     vel_ang_1 = self.rotation_buffer[i]
+                #     vel_ang_2 = self.rotation_buffer[j]
 
-                    if vel_ang_1 * vel_ang_2 < 0: 
-                        # Si las dos velocidades angulares tienen diferente signo, hay un cambio de direccion
-                        cambios_direccion += 1
-                    i += 1
-                    j += 1
+                #     if vel_ang_1 * vel_ang_2 < 0: 
+                #         # Si las dos velocidades angulares tienen diferente signo, hay un cambio de direccion
+                #         cambios_direccion += 1
+                #     i += 1
+                #     j += 1
                 
-                if cambios_direccion > 1:
-                    # Si hay mas de un cambio de direccion se penaliza (con normalizacion)
-                    cambios_direccion -= 1
-                    oscilaciones = -cambios_direccion / (len(self.rotation_buffer)-2)
-                else:
-                    # En caso contrario (un cambio o ninguno), no se penaliza
-                    oscilaciones = 0
+                # if cambios_direccion > 1:
+                #     # Si hay mas de un cambio de direccion se penaliza (con normalizacion)
+                #     cambios_direccion -= 1
+                #     oscilaciones = -cambios_direccion / (len(self.rotation_buffer)-2)
+                # else:
+                #     # En caso contrario (un cambio o ninguno), no se penaliza
+                #     oscilaciones = 0
 
-                reward = desv_linea * 0.8 + oscilaciones * 0.2 # Proporcion 80/20
-                #reward = desv_linea * 0.5 + oscilaciones * 0.5 # Proporcion 50/50
+                reward = desv_linea * 0.95 + self.step_reward * 0.05 # Proporcion 95/5
 
                 #print("Recompensa: {}".format(reward))
 
@@ -199,15 +223,26 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         except:
             print('/gazebo/pause_physics service call failed')
 
-        if len(self.rotation_buffer) == self.rotation_buffer_length:
-            self.rotation_buffer.pop(0)
-            self.rotation_buffer.append(action[1])
-        else:
-            self.rotation_buffer.append(action[1])
+        # if len(self.rotation_buffer) == self.rotation_buffer_length:
+        #     self.rotation_buffer.pop(0)
+        #     self.rotation_buffer.append(action[1])
+        # else:
+        #     self.rotation_buffer.append(action[1])
 
         state = CvBridge().imgmsg_to_cv2(data)
 
-        reward,done = self.calculate_reward(state)   
+        reward, done = self.calculate_reward(state)
+        
+        self.episode_reward += reward
+
+        if done:
+            f = open(self.reward_file_path, 'a')
+            f.write("x: {} y: {}\n".format(self.num_episodes,self.episode_reward))
+            f.close()
+
+            self.episode_reward = 0
+            self.num_episodes += 1
+              
 
         return state, reward, done, {}
 
@@ -277,8 +312,8 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
         self.get_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
 
         # Define observation space
-        self.image_width = 64
-        self.image_height = 48
+        self.image_width = 128
+        self.image_height = 96
 
         self.observation_space = spaces.Box(low=0, high=255,
                                             shape=(self.image_height,self.image_width,3), dtype=np.uint8)
@@ -301,9 +336,11 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
         # Steps per episode counter
         self.steps = 0
 
+        self.step_reward = -1 # Constante asociada a la reward por cada step
+
         # Rotation buffer
-        self.rotation_buffer = []
-        self.rotation_buffer_length = 10
+        # self.rotation_buffer = []
+        # self.rotation_buffer_length = 10
 
         # Finishing coordinates
         self.finish_x = 3.5845
@@ -327,11 +364,11 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
         x_pos = robotino_coordinates.pose.position.x
         y_pos = robotino_coordinates.pose.position.y
 
-        if (abs(x_pos - self.start_circuit.finish_x) < 0.1 and abs(y_pos -  self.start_circuit.finish_y) < 0.1):
+        if (abs(x_pos - self.finish_x) < 0.1 and abs(y_pos -  self.finish_y) < 0.1):
             # Si la posicion del robot es igual a la meta del circuito (con un error posible de 0.1 en cada eje)
             # se finaliza el episodio con una recompensa neutra.
             done = True
-            reward = -self.steps
+            reward = 0
             self.steps = 0
             print("Objective reached")
         else:
@@ -349,11 +386,15 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
                 # ultimas 10 acciones. Se normalizan ambas en el rango [0,1] y se le aplica un peso proporcional
                 # a cada recompensa individual para calcular la recompensa total.
                 done = False
-                self.steps += 1 
+                self.steps += 1
                 fila = state[(int)(0.95*self.image_height),:,:]
                 indice = self.array_max_index(fila)
                 diff = abs(self.image_width/2-indice)
-                desv_linea = -diff / (self.image_width/2)
+
+                if diff < self.image_width*0.05: # Se permite un error del 5% de la anchura de la imagen 
+                    desv_linea = 0
+                else:
+                    desv_linea = (-diff + self.image_width/2) / ((self.image_width/2) - self.image_width*0.05) -1
 
                 #print("Width: ", self.image_width)
                 #print("Fila: ", type(fila))
@@ -362,31 +403,30 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
                 #print("Desviacion linea: ", desv_linea)
 
                 # Evaluar los cambios de direccion
-                i = 0
-                j = 1
+                # i = 0
+                # j = 1
 
-                cambios_direccion = 0
+                # cambios_direccion = 0
                 
-                while j < len(self.rotation_buffer): # Mientras el segundo indice sea menor que la longitud del buffer
-                    vel_ang_1 = self.rotation_buffer[i]
-                    vel_ang_2 = self.rotation_buffer[j]
+                # while j < len(self.rotation_buffer): # Mientras el segundo indice sea menor que la longitud del buffer
+                #     vel_ang_1 = self.rotation_buffer[i]
+                #     vel_ang_2 = self.rotation_buffer[j]
 
-                    if vel_ang_1 * vel_ang_2 < 0: 
-                        # Si las dos velocidades angulares tienen diferente signo, hay un cambio de direccion
-                        cambios_direccion += 1
-                    i += 1
-                    j += 1
+                #     if vel_ang_1 * vel_ang_2 < 0: 
+                #         # Si las dos velocidades angulares tienen diferente signo, hay un cambio de direccion
+                #         cambios_direccion += 1
+                #     i += 1
+                #     j += 1
                 
-                if cambios_direccion > 1:
-                    # Si hay mas de un cambio de direccion se penaliza (con normalizacion)
-                    cambios_direccion -= 1
-                    oscilaciones = -cambios_direccion / (len(self.rotation_buffer)-2)
-                else:
-                    # En caso contrario (un cambio o ninguno), no se penaliza
-                    oscilaciones = 0
+                # if cambios_direccion > 1:
+                #     # Si hay mas de un cambio de direccion se penaliza (con normalizacion)
+                #     cambios_direccion -= 1
+                #     oscilaciones = -cambios_direccion / (len(self.rotation_buffer)-2)
+                # else:
+                #     # En caso contrario (un cambio o ninguno), no se penaliza
+                #     oscilaciones = 0
 
-                reward = desv_linea * 0.8 + oscilaciones * 0.2 # Proporcion 80/20
-                #reward = desv_linea * 0.5 + oscilaciones * 0.5 # Proporcion 50/50
+                reward = desv_linea * 0.95 + self.step_reward * 0.05 # Proporcion 95/5
 
                 #print("Recompensa: {}".format(reward))
 
@@ -418,11 +458,11 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
         except:
             print('/gazebo/pause_physics service call failed')
 
-        if len(self.rotation_buffer) == self.rotation_buffer_length:
-            self.rotation_buffer.pop(0)
-            self.rotation_buffer.append(action[1])
-        else:
-            self.rotation_buffer.append(action[1])
+        # if len(self.rotation_buffer) == self.rotation_buffer_length:
+        #     self.rotation_buffer.pop(0)
+        #     self.rotation_buffer.append(action[1])
+        # else:
+        #     self.rotation_buffer.append(action[1])
 
         state = CvBridge().imgmsg_to_cv2(data)
 

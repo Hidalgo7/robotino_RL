@@ -1,11 +1,12 @@
 <launch>
- 
+    <arg name="model" default=""/> 
     <!-- Launch world -->
     <include file="$(find gazebo_utils)/launch/test_world.launch"/>
     <!-- Image segmentation -->
     <include file="$(find blob_segmentation)/launch/segment.launch"/>
     <!-- Testing -->
     <node pkg="line_following" name="linefollow" type="test.py" output="screen">
+        <param name="model" type="str" value="$(arg model)"/>
     </node>
 
   

@@ -4,18 +4,21 @@ import gym
 import rospy
 import rospkg
 import os
+from datetime import date
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3 import DDPG
 from stable_baselines3.common.callbacks import StopTrainingOnRewardThreshold, EvalCallback
 from stable_baselines3.ddpg.policies import MlpPolicy, CnnPolicy, MultiInputPolicy
 
-def get_version_number(models_path):
+def get_version_number():
     
     count = 0
     # Iterate directory
-    for path in os.listdir(models_path):
+    rospack = rospkg.RosPack()
+    dir = rospack.get_path('line_following') + "/models/"
+    for path in os.listdir():
         # check if current path is a file
-        if os.path.isfile(os.path.join(models_path, path)):
+        if path.startswith(str(date.today())):
             count += 1
     return count
 
@@ -44,12 +47,12 @@ def main():
     model = DDPG(policies[policy],env,verbose=1, buffer_size=buff_size, train_freq=(train_hz,"episode"))
     model.learn(total_timesteps=timesteps,callback=eval_callback)
     print("Training completed")
-    models_path = line_following_pkg + "/models/"
-    version_num = str(get_version_number(models_path))
+    models_path = line_following_pkg + "/models/" + str(date.today())
+    version_num = str(get_version_number())
     print('File count: ', version_num)
-    model_name = "line_following_model" + "_v" + version_num
-    model.save(models_path + model_name)
-    print('Model saved: ', models_path + model_name)
+    model_name = models_path + "-v" + str(version_num) + "/"
+    model.save(model_name + "line_following_model.zip")
+    print('Model saved: ', model_name, "line_following_model.zip")
     rospy.spin()
     
 if __name__=="__main__":

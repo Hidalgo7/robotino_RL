@@ -200,35 +200,43 @@ class Robot():
             #indice = np.argmax(fila != [0,0,0])
             #print("Indice: ", indice)
             diff = abs(self.image_width/2-indice) 
-            print("Diff: ", diff)
+            #print("Diff: ", diff)
             #print("Treshold: ", self.image_width*0.05)
             reward = -diff / (self.image_width/2)
-            print("Penalizacion linea: ", reward)
-
-            # Evaluar los cambios de direccion
-            i = 0
-            j = 1
-
-            cambios_direccion = 0 # Se inicializa a -1 ya que si hay un unico cambio de direccion la recompensa es 0
             
-            while j < len(self.rotation_buffer): # Mientras el segundo indice sea menor que la longitud del buffer
-                vel_ang_1 = self.rotation_buffer[i]
-                vel_ang_2 = self.rotation_buffer[j]
 
-                # Si las dos velocidades angulares tienen diferente signo, hay un cambio de direccion
-                if vel_ang_1 * vel_ang_2 < 0: 
-                    cambios_direccion += 1
-                    print("Cambio de direccion: {} -> {}".format(vel_ang_1,vel_ang_2))
-                i += 1
-                j += 1
+            if len(self.rotation_buffer) == self.rotation_buffer_length: # Solo se evalua si el buffer de rotacion esta completo
 
-            if cambios_direccion > 1:
+                # Evaluar los cambios de direccion
+                i = 0
+                j = 1
+
+                cambios_direccion = 0
+                
+                while j < self.rotation_buffer_length: # Mientras el segundo indice sea menor que la longitud del buffer
+                    vel_ang_1 = self.rotation_buffer[i]
+                    vel_ang_2 = self.rotation_buffer[j]
+
+                    # Si las dos velocidades angulares tienen diferente signo, hay un cambio de direccion
+                    if vel_ang_1 * vel_ang_2 < 0: 
+                        cambios_direccion += 1
+                        #print("Cambio de direccion: {} -> {}".format(vel_ang_1,vel_ang_2))
+                    i += 1
+                    j += 1
+
                 cambios_direccion -= 1
                 recompensa = -cambios_direccion / (len(self.rotation_buffer)-2)
             else:
                 recompensa = 0
 
+            print("Penalizacion linea: ", reward)
             print("Penalizacion oscilacion: {}".format(recompensa))
+
+            total = 0.5 * reward + 0.5 * recompensa
+
+            print("Penalizacion final: ", total)
+
+
             
     
     def get_pose(self):
