@@ -237,7 +237,7 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
 
         if done:
             f = open(self.reward_file_path, 'a')
-            f.write("x: {} y: {}\n".format(self.num_episodes,self.episode_reward))
+            f.write("{} {}\n".format(self.num_episodes,self.episode_reward))
             f.close()
 
             self.episode_reward = 0
