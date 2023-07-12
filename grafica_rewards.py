@@ -12,7 +12,9 @@ if __name__ =="__main__":
         x_axis = [i for i in range(1,len(lines)+1)]
         y_axis = []
         for line in lines:
-            reward_value = float(line[8:])
+            _, y = line.split(" ")
+            reward_value = float(y)
+            print(reward_value)
             y_axis.append(reward_value)
 
         plt.plot(x_axis, y_axis)

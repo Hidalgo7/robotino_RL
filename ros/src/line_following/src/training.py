@@ -11,16 +11,15 @@ from stable_baselines3.common.callbacks import StopTrainingOnRewardThreshold, Ev
 from stable_baselines3.ddpg.policies import MlpPolicy, CnnPolicy, MultiInputPolicy
 
 def get_version_number():
-    
     count = 0
     # Iterate directory
     rospack = rospkg.RosPack()
     dir = rospack.get_path('line_following') + "/models/"
-    for path in os.listdir():
-        # check if current path is a file
+    for path in os.listdir(dir):
+        # check if current path starts with todays date
         if path.startswith(str(date.today())):
             count += 1
-    return count
+    return count-1
 
 def main():
 
@@ -28,7 +27,7 @@ def main():
 
     # get an instance of RosPack with the default search paths
     rospack = rospkg.RosPack()
-    # get the file path for rospy_tutorials
+    # get the file path for line_following
     line_following_pkg = rospack.get_path('line_following')
 
     reward_th = rospy.get_param("~reward_threshold", -100)
