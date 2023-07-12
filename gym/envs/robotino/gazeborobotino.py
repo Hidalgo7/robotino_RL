@@ -96,6 +96,10 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         self.episode_reward = 0
         self.num_episodes = 1
 
+        # Line and time rewards weight
+        self.line_weight = 0.95
+        self.time_weight = 0.05
+
         # Fichero para guardar las recompensas de los episodios
         rospack = rospkg.RosPack()
 
@@ -107,6 +111,16 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         os.makedirs(model_path)
 
         self.reward_file_path = model_path + "/rewards.txt"
+        self.info_file_path = model_path + "/info.txt"
+
+        # Save training info
+        f = open(self.info_file_path, 'w')
+        image_info = "Image width: " + str(self.image_width) + "\t" + "Image height: " + str(self.image_height) + "\n"
+        vel_info = "Linear max: " + str(self.max_linear_speed) + "\t" + "Linear min: " + str(self.min_linear_speed) + "\t" + "Angular: " + str(self.max_angular_speed) + "\n"
+        line_info = "Line weight: " + str(self.line_weight) + "\t" + "Time weight: " + str(self.time_weight) + "\n" 
+        info = image_info + vel_info + line_info
+        f.write(info)
+        f.close()
         
 
         self.reset()
@@ -191,7 +205,7 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
                 #     # En caso contrario (un cambio o ninguno), no se penaliza
                 #     oscilaciones = 0
 
-                reward = desv_linea * 0.95 + self.step_reward * 0.05 # Proporcion 95/5
+                reward = desv_linea * self.line_weight + self.step_reward * self.time_weight # Proporcion 95/5
 
                 #print("Recompensa: {}".format(reward))
 
@@ -236,6 +250,7 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         self.episode_reward += reward
 
         if done:
+            # Save Reward
             f = open(self.reward_file_path, 'a')
             f.write("{} {}\n".format(self.num_episodes,self.episode_reward))
             f.close()
@@ -338,9 +353,9 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
 
         self.step_reward = -1 # Constante asociada a la reward por cada step
 
-        # Rotation buffer
-        # self.rotation_buffer = []
-        # self.rotation_buffer_length = 10
+        # Line and time rewards weight
+        self.line_weight = 0.95
+        self.time_weight = 0.05
 
         # Finishing coordinates
         self.finish_x = 3.5845
@@ -426,7 +441,7 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
                 #     # En caso contrario (un cambio o ninguno), no se penaliza
                 #     oscilaciones = 0
 
-                reward = desv_linea * 0.95 + self.step_reward * 0.05 # Proporcion 95/5
+                reward = desv_linea * self.line_weight + self.step_reward * self.time_weight # Proporcion 95/5
 
                 #print("Recompensa: {}".format(reward))
 
