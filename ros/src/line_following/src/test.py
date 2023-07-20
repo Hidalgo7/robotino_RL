@@ -36,7 +36,8 @@ def main():
         print
         print("ERROR: Se debe indicar la carpeta de models desde la que se quiere cargar el modelo")
     else:
-        env = gym.make('GazeboRobotinoTestEnv-v0')
+        # env = gym.make('GazeboRobotinoTestEnv-v0')
+        env = gym.make('GazeboRobotinoTrainEnv-v0')
         line_following_pkg = rospack.get_path('line_following')
 
         models_path = line_following_pkg + "/models/" + model_name + "/"

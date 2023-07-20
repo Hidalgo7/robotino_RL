@@ -21,6 +21,23 @@ segment_blob_path = '/home/bee/ikerkuntza/tfg/2022-2023/IkerHidalgo/robotino_RL/
 sys.path.append(segment_blob_path)
 import segment_blob
 
+line_weight_list = [0.95, 1.0, 0.9, 0.7]
+time_weight_list = [0.05, 0.0, 0.1, 0.3]
+i = 0
+
+
+# PARAMETERS
+max_linear_speed = 0.4
+min_linear_speed = 0.1
+max_angular_speed = 0.5
+image_width = 128
+image_height = 96
+line_weight = line_weight_list[i]
+time_weight = time_weight_list[i]
+error_meta = 0.2
+error_imagen = 0.05
+fila_linea = 0.95
+
 class Circuit:
     def __init__(self,start,finish):
         self.start_posx = start[0]
@@ -57,9 +74,9 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
                                             shape=(self.image_height,self.image_width,3), dtype=np.uint8)
 
         # Define action space
-        self.max_linear_speed = 0.4
-        self.min_linear_speed = 0.05
-        self.max_angular_speed = 0.5
+        self.max_linear_speed = max_linear_speed
+        self.min_linear_speed = min_linear_speed
+        self.max_angular_speed = max_angular_speed
 
         self.action_space = spaces.Box(low=np.array([self.min_linear_speed, -self.max_angular_speed]),
                                         high=np.array([self.max_linear_speed, self.max_angular_speed]),
@@ -97,8 +114,8 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         self.num_episodes = 1
 
         # Line and time rewards weight
-        self.line_weight = 0.95
-        self.time_weight = 0.05
+        self.line_weight = line_weight
+        self.time_weight = time_weight
 
         # Fichero para guardar las recompensas de los episodios
         rospack = rospkg.RosPack()
@@ -117,8 +134,10 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         f = open(self.info_file_path, 'w')
         image_info = "Image width: " + str(self.image_width) + "\t" + "Image height: " + str(self.image_height) + "\n"
         vel_info = "Linear max: " + str(self.max_linear_speed) + "\t" + "Linear min: " + str(self.min_linear_speed) + "\t" + "Angular: " + str(self.max_angular_speed) + "\n"
-        line_info = "Line weight: " + str(self.line_weight) + "\t" + "Time weight: " + str(self.time_weight) + "\n" 
-        info = image_info + vel_info + line_info
+        weight_info = "Line weight: " + str(self.line_weight) + "\t" + "Time weight: " + str(self.time_weight) + "\n"
+        error_info = "Error meta: " + str(error_meta) + "\t" + "Error imagen: " + str(error_imagen) + "\n"
+        line_info = "Fila linea: " + str(fila_linea) + "\n"
+        info = image_info + vel_info + weight_info + error_info + line_info
         f.write(info)
         f.close()
         
@@ -143,7 +162,7 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
         x_pos = robotino_coordinates.pose.position.x
         y_pos = robotino_coordinates.pose.position.y
 
-        if (abs(x_pos - self.start_circuit.finish_x) < 0.1 and abs(y_pos -  self.start_circuit.finish_y) < 0.1):
+        if (abs(x_pos - self.start_circuit.finish_x) < error_meta and abs(y_pos -  self.start_circuit.finish_y) < error_meta):
             # Si la posicion del robot es igual a la meta del circuito (con un error posible de 0.1 en cada eje)
             # se finaliza el episodio con una recompensa neutra.
             done = True
@@ -166,20 +185,20 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
                 # a cada recompensa individual para calcular la recompensa total.
                 done = False
                 self.steps += 1
-                fila = state[(int)(0.95*self.image_height),:,:]
+                fila = state[(int)(fila_linea*self.image_height),:,:]
                 indice = self.array_max_index(fila)
                 diff = abs(self.image_width/2-indice)
 
-                if diff < self.image_width*0.05: # Se permite un error del 5% de la anchura de la imagen 
+                if diff < self.image_width*error_imagen: # Se permite un error del 5% de la anchura de la imagen 
                     desv_linea = 0
                 else:
-                    desv_linea = (-diff + self.image_width/2) / ((self.image_width/2) - self.image_width*0.05) -1
+                    desv_linea = (-diff + self.image_width/2) / ((self.image_width/2) - self.image_width*error_imagen) -1
 
-                #print("Width: ", self.image_width)
-                #print("Fila: ", type(fila))
-                #print("Indice: ", indice)
-                #print("Diff: ", diff)
-                #print("Desviacion linea: ", desv_linea)
+                # print("Width: ", self.image_width)
+                # print("Fila: ", type(fila))
+                # print("Indice: ", indice)
+                # print("Diff: ", diff)
+                # print("Desviacion linea: ", desv_linea)
 
                 # Evaluar los cambios de direccion
                 # i = 0
@@ -254,7 +273,7 @@ class GazeboRobotinoTrainEnv(gazebo_env.GazeboEnv):
             f = open(self.reward_file_path, 'a')
             f.write("{} {}\n".format(self.num_episodes,self.episode_reward))
             f.close()
-
+            print("Episode Reward: ", self.episode_reward)
             self.episode_reward = 0
             self.num_episodes += 1
               
@@ -327,16 +346,16 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
         self.get_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
 
         # Define observation space
-        self.image_width = 128
-        self.image_height = 96
+        self.image_width = image_width
+        self.image_height = image_height
 
         self.observation_space = spaces.Box(low=0, high=255,
                                             shape=(self.image_height,self.image_width,3), dtype=np.uint8)
         
         # Define action space
-        self.max_linear_speed = 0.4
-        self.min_linear_speed = 0.05
-        self.max_angular_speed = 0.5
+        self.max_linear_speed = max_linear_speed
+        self.min_linear_speed = min_linear_speed
+        self.max_angular_speed = max_angular_speed
 
         self.action_space = spaces.Box(low=np.array([self.min_linear_speed, -self.max_angular_speed]),
                                         high=np.array([self.max_linear_speed, self.max_angular_speed]),
@@ -354,8 +373,8 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
         self.step_reward = -1 # Constante asociada a la reward por cada step
 
         # Line and time rewards weight
-        self.line_weight = 0.95
-        self.time_weight = 0.05
+        self.line_weight = line_weight
+        self.time_weight = time_weight
 
         # Finishing coordinates
         self.finish_x = 3.5845
@@ -379,7 +398,7 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
         x_pos = robotino_coordinates.pose.position.x
         y_pos = robotino_coordinates.pose.position.y
 
-        if (abs(x_pos - self.finish_x) < 0.1 and abs(y_pos -  self.finish_y) < 0.1):
+        if (abs(x_pos - self.finish_x) < error_meta and abs(y_pos -  self.finish_y) < error_meta):
             # Si la posicion del robot es igual a la meta del circuito (con un error posible de 0.1 en cada eje)
             # se finaliza el episodio con una recompensa neutra.
             done = True
@@ -402,14 +421,14 @@ class GazeboRobotinoTestEnv(gazebo_env.GazeboEnv):
                 # a cada recompensa individual para calcular la recompensa total.
                 done = False
                 self.steps += 1
-                fila = state[(int)(0.95*self.image_height),:,:]
+                fila = state[(int)(fila_linea*self.image_height),:,:]
                 indice = self.array_max_index(fila)
                 diff = abs(self.image_width/2-indice)
 
-                if diff < self.image_width*0.05: # Se permite un error del 5% de la anchura de la imagen 
+                if diff < self.image_width*error_imagen: # Se permite un error del 5% de la anchura de la imagen 
                     desv_linea = 0
                 else:
-                    desv_linea = (-diff + self.image_width/2) / ((self.image_width/2) - self.image_width*0.05) -1
+                    desv_linea = (-diff + self.image_width/2) / ((self.image_width/2) - self.image_width*error_imagen) -1
 
                 #print("Width: ", self.image_width)
                 #print("Fila: ", type(fila))

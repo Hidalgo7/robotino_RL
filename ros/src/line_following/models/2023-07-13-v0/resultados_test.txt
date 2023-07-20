@@ -1,0 +1,2 @@
+Tiempo medio para finalizar el circuito: 19.372909235954285
+Porcentaje del tiempo con la linea en el centro de la imagen: 2.22460342110701%

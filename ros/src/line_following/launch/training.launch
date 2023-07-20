@@ -9,7 +9,7 @@
         <param name="policy" type="int" value="0" /> <!-- MlpPolicy = 0, CnnPolicy = 1, MultiInputPolicy = 2-->
         <param name="buff_size" type="int" value="10000" />
         <param name="train_hz" type="int" value="3" />
-        <param name="timesteps" type="int" value="200000" /> <!-- 200000 -->
+        <param name="timesteps" type="int" value="400000" /> <!-- 200000 -->
     </node>
 
 </launch>

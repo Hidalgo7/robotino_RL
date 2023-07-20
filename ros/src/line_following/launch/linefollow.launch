@@ -8,6 +8,4 @@
     <node pkg="line_following" name="linefollow" type="test.py" output="screen">
         <param name="model" type="str" value="$(arg model)"/>
     </node>
-
-  
 </launch>

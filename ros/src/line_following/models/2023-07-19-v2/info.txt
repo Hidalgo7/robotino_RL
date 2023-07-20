@@ -1,0 +1,5 @@
+Image width: 128	Image height: 96
+Linear max: 0.4	Linear min: 0.1	Angular: 0.5
+Line weight: 0.95	Time weight: 0.05
+Error meta: 0.2	Error imagen: 0.05
+Fila linea: 0.95
